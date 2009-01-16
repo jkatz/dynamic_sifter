@@ -1,0 +1,51 @@
+h1. DynamicSifter
+
+DynamicSifter is a safe way to simplify your search-and-sieve (search-and-filter) type searches in your ActiveRecord classes.
+
+DynamicSifter takes advantage of named_scopes and uses them as filters for your searches.
+
+Key features:
+
+* Takes the same arguments as any <pre><code>ActiveRecord#find</code></pre> call
+* Allows you to chain filters together
+
+h2.  Setup
+
+You can add DynamicSifter to any application that uses ActiveRecord >= 2.1.0.  You can add it to a Rails application by doing the following:
+
+  git submodule add git://github.com/jkatz/dynamic_sifter.git vendor/plugins/dynamic_sifter
+
+h2.  Usage
+
+To illustrate how to use DynamicSifter, let us use this example class:
+
+  class Book < ActiveRecord::Base
+    named_scope :in_stock, :conditions => ['quantity > 0']
+    named_scope :history, :conditions => { :genre => 'history' }
+    named_scope :paperback, :conditions => { :paperback => true }
+    # ...
+  end
+
+Let us say we have a form on our application that allows us to search for books with various attributes.  We want to be able to get all the results in one-line of code, without worrying about writing complex boolean statements to apply the correct filters.  To make a hard-coded, concrete example, to find all the history books that are in_stock, all we have to do is:
+
+  DynamicSifter.search( :filters => [:history, :in_stock])
+  
+And DynamicSifter will returns our results just like any <pre><code>ActiveRecord::#find</code></pre> query!
+
+To get more complex, let's say I want to search for all the books by Yukio Mishima that are in stock and are in paperback.  It would be silly to have a named scope for every author in our database!  With DynamicSifter, we would do the following:
+
+  DynamicSifter.search( :conditions => { :author => 'Yukio Mishima' }, :filters => [:in_stock, :paperback])
+
+Let's say we store our publisher contact information in a <pre><code>Publisher</code></pre> model.  If we wanted to find the all the publishers for the books by Yukio Mishima that are paperback, in-stock, and have the list of publishers by in alphabetical order by name, we could do:
+
+  DynamicSifter.search( :include => :publisher, :conditions => { :author => 'Yukio Mishima' }, :select => 'DISTINCT publishers.name', :order => 'publishers.name', :filters => [:in_stock, :paper_back] )
+
+h2.  Why DynamicSifter?
+
+DynamicSifter grew out of a need to find an easy way to chain search filters triggered by user inputs.  An example of this is maintaining a list of contacts and sorting them by various information, e.g. breaking it down by name, particular attributes about the contacts, etc.  Because I wanted to limit the amount of code in my Rails controllers for handling this, I wanted a dynamic, safe way to update my information without too much hassle.  In one use of this, I actually have the users trigger the scopes, but the code in DynamicSifter ensures that the scope actually exists and that the user is not trying to do anything too funky.
+
+h2.  Future Releases
+
+* Specs, specs, specs!
+* Better support for scopes on includes
+* Support for other ORMs?
