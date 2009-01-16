@@ -30,13 +30,13 @@ Let us say we have a form on our application that allows us to search for books 
 
   DynamicSifter.search( :filters => [:history, :in_stock])
   
-And DynamicSifter will returns our results just like any <pre><code>ActiveRecord::#find</code></pre> query!
+And DynamicSifter will returns our results just like any <pre>ActiveRecord::#find</pre> query!
 
 To get more complex, let's say I want to search for all the books by Yukio Mishima that are in stock and are in paperback.  It would be silly to have a named scope for every author in our database!  With DynamicSifter, we would do the following:
 
   DynamicSifter.search( :conditions => { :author => 'Yukio Mishima' }, :filters => [:in_stock, :paperback])
 
-Let's say we store our publisher contact information in a <pre><code>Publisher</code></pre> model.  If we wanted to find the all the publishers for the books by Yukio Mishima that are paperback, in-stock, and have the list of publishers by in alphabetical order by name, we could do:
+Let's say we store our publisher contact information in a <pre>Publisher</pre> model.  If we wanted to find the all the publishers for the books by Yukio Mishima that are paperback, in-stock, and have the list of publishers by in alphabetical order by name, we could do:
 
   DynamicSifter.search( :include => :publisher, :conditions => { :author => 'Yukio Mishima' }, :select => 'DISTINCT publishers.name', :order => 'publishers.name', :filters => [:in_stock, :paper_back] )
 
