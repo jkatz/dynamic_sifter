@@ -9,6 +9,11 @@ Key features:
 * Takes the same arguments as any ActiveRecord#find call
 * Allows you to chain filters together
 
+h2. New in 0.2.0
+
+* Can now use filters that take lambda methods
+* Update README.textile to be more correct
+
 h2.  Setup
 
 You can add DynamicSifter to any application that uses ActiveRecord >= 2.1.0.  You can add it to a Rails application by doing the following:
@@ -23,22 +28,29 @@ To illustrate how to use DynamicSifter, let us use this example class:
     named_scope :in_stock, :conditions => ['quantity > 0']
     named_scope :history, :conditions => { :genre => 'history' }
     named_scope :paperback, :conditions => { :paperback => true }
+    named_scope :author => lambda { |author_name| :conditions => ['author = ?', author_name] }
     # ...
   end
 
 Let us say we have a form on our application that allows us to search for books with various attributes.  We want to be able to get all the results in one-line of code, without worrying about writing complex boolean statements to apply the correct filters.  To make a hard-coded, concrete example, to find all the history books that are in_stock, all we have to do is:
 
-  DynamicSifter.search( :filters => [:history, :in_stock])
-  
+  DynamicSifter.search(Book, :filters => [:history, :in_stock])
+
 And DynamicSifter will returns our results just like any ActiveRecord::#find query!
 
 To get more complex, let's say I want to search for all the books by Yukio Mishima that are in stock and are in paperback.  It would be silly to have a named scope for every author in our database!  With DynamicSifter, we would do the following:
 
-  DynamicSifter.search( :conditions => { :author => 'Yukio Mishima' }, :filters => [:in_stock, :paperback])
+  DynamicSifter.search(Book, :conditions => { :author => 'Yukio Mishima' }, :filters => [:in_stock, :paperback])
 
 Let's say we store our publisher contact information in a Publisher model.  If we wanted to find the all the publishers for the books by Yukio Mishima that are paperback, in-stock, and have the list of publishers by in alphabetical order by name, we could do:
 
-  DynamicSifter.search( :include => :publisher, :conditions => { :author => 'Yukio Mishima' }, :select => 'DISTINCT publishers.name', :order => 'publishers.name', :filters => [:in_stock, :paper_back] )
+  DynamicSifter.search(Book, :include => :publisher, :conditions => { :author => 'Yukio Mishima' }, :select => 'DISTINCT publishers.name', :order => 'publishers.name', :filters => [:in_stock, :paper_back] )
+
+Finally, we got smart and decided to put in a named_scope that let's us filter by author.  We want to filter by author and paperback, we can do:
+
+  DynamicSifter.search(Book, :filters => { :author => ['Yukio Mishima'], :paperback => [] })
+
+Easy!
 
 h2.  Why DynamicSifter?
 
