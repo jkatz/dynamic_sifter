@@ -29,10 +29,9 @@ class DynamicSifter
 private
 
   def apply_filters(results)
-    @filters.inject(results) { |result,filter|
-      ( filter.respond_to?(:first) ?
-        result.send(filter.first.to_sym, *filter.last) : 
-        result.send(filter.to_sym) ) if filter_exists?(filter)
+    @filters.inject(results) { |result,data|
+      filter, args = data
+      result.send(filter.to_sym, *args) if filter_exists?(filter)
     }
   end
 
