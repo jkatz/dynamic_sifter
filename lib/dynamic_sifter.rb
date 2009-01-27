@@ -40,7 +40,8 @@ private
     when String: filters.to_a
     when Hash: filters.to_a
     else
-      filters
+      filters ? 
+        filters : []
     end
   end
 
