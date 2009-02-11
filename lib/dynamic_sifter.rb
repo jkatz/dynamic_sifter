@@ -23,7 +23,7 @@ class DynamicSifter
   end
 
   def search
-    apply_filters(@model.scoped( @options ))
+    apply_filters(@model.scoped(@options))
   end
 
 private
