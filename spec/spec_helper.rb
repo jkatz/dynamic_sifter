@@ -13,7 +13,8 @@ ActiveRecord::Schema.define do
 
   create_table :bottles do |bottle|
     bottle.references :wine
-    bottle.integer :year, :base_price
+    bottle.date :year
+    bottle.integer :base_price
   end
 
   create_table :wines do |wine|
@@ -27,4 +28,17 @@ ActiveRecord::Schema.define do
     region.text :description
   end
 
+end
+
+class Bottle < ActiveRecord::Base
+  belongs_to :wine
+end
+
+class Wine < ActiveRecord::Base
+  has_many :bottles
+  belongs_to :region
+end
+
+class Region < ActiveRecord::Base
+  has_many :wines
 end
