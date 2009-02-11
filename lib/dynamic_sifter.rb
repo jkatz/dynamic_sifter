@@ -29,9 +29,8 @@ class DynamicSifter
 private
 
   def apply_filters(results)
-    @filters.inject(results) { |result,data|
-      filter, args = data
-      result.send(filter.to_sym, *args) if filter_exists?(filter)
+    @filters.inject(results) { |result, (filter, args)|
+      filter_exists?(filter) ? result.send(filter, *args) : result
     }
   end
 
