@@ -45,7 +45,8 @@ private
   end
 
   def filter_exists?(filter)
-    @scopes.include?(filter.to_sym)
+    filter.kind_of?(String) && filter.empty? ?
+      false : @scopes.include?(filter.to_sym)
   end
 
   class DynamicSifterError < RuntimeError; end
