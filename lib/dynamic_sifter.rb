@@ -30,6 +30,7 @@ private
 
   def apply_filters(results)
     @filters.inject(results) { |result, (filter, args)|
+      filter, args = parse(filter, *args)
       filter_exists?(filter) ? result.send(filter, *args) : result
     }
   end
@@ -46,7 +47,15 @@ private
 
   def filter_exists?(filter)
     filter.kind_of?(String) && filter.empty? ?
-      false : @scopes.include?(filter.to_sym)
+      false : scopes.include?(filter.to_sym)
+  end
+
+  def parse(filter, *args)
+    if filter.kind_of?(String)
+      [filter, *args]
+    elsif filter.kind_of?(Hash) || filter.kind_of?(HashWithIndifferentAccess)
+      [filter.keys.first, *filter.values.first]
+    end
   end
 
   class DynamicSifterError < RuntimeError; end
