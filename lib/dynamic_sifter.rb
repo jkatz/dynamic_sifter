@@ -47,7 +47,7 @@ private
 
   def filter_exists?(filter)
     filter.kind_of?(String) && filter.empty? ?
-      false : scopes.include?(filter.to_sym)
+      false : @scopes.include?(filter.to_sym)
   end
 
   def parse(filter, *args)
